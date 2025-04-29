@@ -18,7 +18,6 @@ for(var i = 0; i < tables.length; i++) {
 		//Use grey for M ions
 		tds[j].style.backgroundColor = "#abb2b9"
 		
-		var newValue = text.split("_")
 		tds[j].innerHTML = newValue[0]
     	}
 

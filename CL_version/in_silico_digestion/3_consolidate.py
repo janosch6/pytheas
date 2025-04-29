@@ -31,30 +31,39 @@ from collections import defaultdict
 import pandas as pd
 
 # Initialize and define launch options
-parser = argparse.ArgumentParser(description='List of available options')
-parser.add_argument('--MS', choices=['1', '2', 'MS1', 'MS2'], default='MS2',
-                    help='Indicate if MS1 or MS2 has to be performed (Optional, default = MS2)')
-parser.add_argument('--min_length', default=3, type=int,
-                    help='Only fragments longer or equal to this value will be consolidated (Optional, default = 3)')
+parser = argparse.ArgumentParser(description="List of available options")
+parser.add_argument(
+    "--MS",
+    choices=["1", "2", "MS1", "MS2"],
+    default="MS2",
+    help="Indicate if MS1 or MS2 has to be performed (Optional, default = MS2)",
+)
+parser.add_argument(
+    "--min_length",
+    default=3,
+    type=int,
+    help="Only fragments longer or equal to this value will be consolidated (Optional, default = 3)",
+)
 args = parser.parse_args()
 
 
-def read_csv(input_csv='nts_light.csv'):
+def read_csv(input_csv="nts_light.csv"):
     """
     Create a dictionary containing all ID : ID_ext couples, one letter and extended IDs for all nucleotides
     """
     if not os.path.exists(input_csv):
         print(
             "ERROR! File {} with info on nucleotides from script 2_modify.py is missing. "
-            "Execution terminated without generating the output".format(input_csv))
+            "Execution terminated without generating the output".format(input_csv)
+        )
         sys.exit(1)
 
     else:
         # Read the csv file with the nucleotides dictionary
-        df = pd.read_csv(input_csv, usecols=['ID', 'ID_ext'])
+        df = pd.read_csv(input_csv, usecols=["ID", "ID_ext"])
 
         # Drop rows with NaN values
-        df = df[pd.notnull(df['ID'])]
+        df = df[pd.notnull(df["ID"])]
 
         return dict(zip(df.ID, df.ID_ext))
 
@@ -65,7 +74,7 @@ def fragment_list():
     """
     # Checks if the standard input file output.2 is present in the working directory
     try:
-        open(os.getcwd() + "/output.2", 'r')
+        open(os.getcwd() + "/output.2", "r")
 
     except:
         print("ERROR!!! Input file " + os.getcwd() + "/output.2 is missing")
@@ -73,7 +82,7 @@ def fragment_list():
 
     output_lines = []
 
-    with open(os.getcwd() + "/output.2", 'r') as infile:
+    with open(os.getcwd() + "/output.2", "r") as infile:
         for line in infile:
             if line[0] != "#" and line != "\n":
                 split = line.split()
@@ -81,19 +90,42 @@ def fragment_list():
 
                     # Only truly identical fragment longer or equal to min_length are consolidated
                     if args.MS[-1] == "2" and len(split[1]) >= args.min_length:
-                        output_lines.append("{} {} {} {} {} {} {},{},{} {} {} {}".format(split[1], split[7], split[4],
-                                                                                         split[6], split[5], 1,
-                                                                                         split[0], split[2], split[3],
-                                                                                         split[0], split[2], split[3]))
+                        output_lines.append(
+                            "{} {} {} {} {} {} {},{},{} {} {} {}".format(
+                                split[1],
+                                split[7],
+                                split[4],
+                                split[6],
+                                split[5],
+                                1,
+                                split[0],
+                                split[2],
+                                split[3],
+                                split[0],
+                                split[2],
+                                split[3],
+                            )
+                        )
 
                     # Append the original sequence as info in case of MS1 fragment consolidated by masses
                     else:
                         output_lines.append(
-                            "{} {} {} {} {} {} {},{},{},{} {} {} {}".format(split[1], split[7], split[4],
-                                                                            split[6], split[5], 1,
-                                                                            split[0], split[2], split[3],
-                                                                            split[1], split[0], split[2],
-                                                                            split[3]))
+                            "{} {} {} {} {} {} {},{},{},{} {} {} {}".format(
+                                split[1],
+                                split[7],
+                                split[4],
+                                split[6],
+                                split[5],
+                                1,
+                                split[0],
+                                split[2],
+                                split[3],
+                                split[1],
+                                split[0],
+                                split[2],
+                                split[3],
+                            )
+                        )
 
     return output_lines
 
@@ -103,13 +135,22 @@ def redundant_dic():
     Create a dictionary with all the lines with redundant fragments
     """
     output_lines = []
-    with open(os.getcwd() + "/output.2", 'r') as infile:
+    with open(os.getcwd() + "/output.2", "r") as infile:
         for line in infile:
             if line[0] != "#":
                 split = line.split()
                 if split[2].isdigit():
-                    output_lines.append('{} {} {} {} {} {} {}'.format(split[1], split[7], split[6], split[5],
-                                                                      split[2], split[3], split[0]))
+                    output_lines.append(
+                        "{} {} {} {} {} {} {}".format(
+                            split[1],
+                            split[7],
+                            split[6],
+                            split[5],
+                            split[2],
+                            split[3],
+                            split[0],
+                        )
+                    )
 
     d = defaultdict(list)
 
@@ -118,11 +159,15 @@ def redundant_dic():
         # In case of MS2 only fragments >= min_length and with identical sequences
         # are consolidated (cannot be discriminated by MS2)
         if args.MS[-1] == "2" and len(item.split()[0]) >= args.min_length:
-            d[' '.join(item.split()[:4])].append(i)
+            d[" ".join(item.split()[:4])].append(i)
 
         # In case MS1 is selected, consolidate all fragments with equal masses writing alphabetized sequences
         else:
-            d["{} {} {}".format("".join(sorted(item.split()[0])), item.split()[2], item.split()[3])].append(i)
+            d[
+                "{} {} {}".format(
+                    "".join(sorted(item.split()[0])), item.split()[2], item.split()[3]
+                )
+            ].append(i)
 
     # The dictionary contains info on the redundant fragment coupled with its line number
     d = {k: v for k, v in d.items() if len(v) > 1}
@@ -144,9 +189,13 @@ def consol(fragments, min_length, redundant_dictionary, mod_alphabet):
     # Lines with redundant fragments are consolidated together
     for key in redundant_dictionary:
         for i in range(1, len(redundant_dictionary[key])):
-            fragments[redundant_dictionary[key][0]] = (" ".join(fragments[redundant_dictionary[key][0]].split()[0:7])
-                                                       + ";" + fragments[redundant_dictionary[key][i]].split()[6] + " "
-                                                       + " ".join(fragments[redundant_dictionary[key][0]].split()[-3:]))
+            fragments[redundant_dictionary[key][0]] = (
+                " ".join(fragments[redundant_dictionary[key][0]].split()[0:7])
+                + ";"
+                + fragments[redundant_dictionary[key][i]].split()[6]
+                + " "
+                + " ".join(fragments[redundant_dictionary[key][0]].split()[-3:])
+            )
             indices.append(redundant_dictionary[key][i])
 
     # Delete the redundant occurrences from the fragments list
@@ -159,9 +208,9 @@ def consol(fragments, min_length, redundant_dictionary, mod_alphabet):
             unique_mol = []
 
             # Modify the last three columns of the line in case of redundant fragments
-            for x in line.split()[6].split(';'):
-                if x.split(',')[0] not in unique_mol:
-                    unique_mol.append(x.split(',')[0])
+            for x in line.split()[6].split(";"):
+                if x.split(",")[0] not in unique_mol:
+                    unique_mol.append(x.split(",")[0])
 
             # When the redundance is between two fragments of different molecules the output is a - followed by 0 0
             if len(unique_mol) > 1:
@@ -174,14 +223,20 @@ def consol(fragments, min_length, redundant_dictionary, mod_alphabet):
 
             # Assemble the final lines for MS1 and MS2 output
             if args.MS[-1] == "1":
-                final_frag[i] = "{} {} {} {}".format("".join(sorted(final_frag[i].split()[0])),
-                                                     " ".join(final_frag[i].split()[1:5]),
-                                                     line.count(';') + 1, line_end)
+                final_frag[i] = "{} {} {} {}".format(
+                    "".join(sorted(final_frag[i].split()[0])),
+                    " ".join(final_frag[i].split()[1:5]),
+                    line.count(";") + 1,
+                    line_end,
+                )
 
             else:
-                final_frag[i] = "{} {} {} {}".format("".join(final_frag[i].split()[0]),
-                                                     " ".join(final_frag[i].split()[1:5]),
-                                                     line.count(';') + 1, line_end)
+                final_frag[i] = "{} {} {} {}".format(
+                    "".join(final_frag[i].split()[0]),
+                    " ".join(final_frag[i].split()[1:5]),
+                    line.count(";") + 1,
+                    line_end,
+                )
 
     return final_frag
 
@@ -197,16 +252,18 @@ def output_file(lines, outfile, min_length):
     if args.MS[-1] == "2":
         final_lines.append("#MIN_LENGTH " + str(min_length) + "\n")
 
-    with open(outfile, 'r') as infile:
-        for line in open(outfile, 'r'):
+    with open(outfile, "r") as infile:
+        for line in open(outfile, "r"):
             if line[0] == "#":
                 final_lines.append(line)
 
             else:
-                if not line.split()[2].isdigit() and line.split()[2] != '-':
+                if not line.split()[2].isdigit() and line.split()[2] != "-":
                     # Write the header line for the columns of the output
-                    final_lines.append("sequence mod miss 3'end 5'end num_copy sequence_location"
-                                        " molecule residue_start residue_end\n")
+                    final_lines.append(
+                        "sequence mod miss 3'end 5'end num_copy sequence_location"
+                        " molecule residue_start residue_end\n"
+                    )
 
     for line in lines:
 
@@ -226,14 +283,22 @@ if __name__ == "__main__":
     out_files = []
 
     if args.MS[-1] == "1":
-        open(os.getcwd() + "/output.3.MS1", 'w').writelines(
-            output_file(consol(fragment_list(), 10000, redundant_dic(), read_csv()),
-                        os.getcwd() + "/output.2", args.min_length))
+        open(os.getcwd() + "/output.3.MS1", "w").writelines(
+            output_file(
+                consol(fragment_list(), 10000, redundant_dic(), read_csv()),
+                os.getcwd() + "/output.2",
+                args.min_length,
+            )
+        )
         out_files.append("output.3.MS1")
     else:
-        open(os.getcwd() + "/output.3.MS2", 'w').writelines(
-            output_file(consol(fragment_list(), args.min_length, redundant_dic(), read_csv()),
-                        os.getcwd() + "/output.2", args.min_length))
+        open(os.getcwd() + "/output.3.MS2", "w").writelines(
+            output_file(
+                consol(fragment_list(), args.min_length, redundant_dic(), read_csv()),
+                os.getcwd() + "/output.2",
+                args.min_length,
+            )
+        )
         out_files.append("output.3.MS2")
 
     print("Done! Output file(s) -> {}".format(" ".join(out_files)))

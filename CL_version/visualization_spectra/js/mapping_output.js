@@ -21,7 +21,6 @@ for(var i = 0; i < tables.length; i++) {
 		if (value % 10 != 0 && value != 1) {
 		
 			ths[j].innerHTML = "";	
-		} else {
 			ths[j].style.fontSize = "8px";
 		}
         }

@@ -17,7 +17,6 @@ OPTIONS
 --score_file -> scored/matched peaks to visualize, output of the scoring script
 --highest_peaks (OPT, default = all) -> Number of most intense MS2 peaks to be shown in the output spectrum
 --mz_min (OPT, default = auto) -> minimum value of m/z (x axis) to use for plotting
---mz_max (OPT, default = auto) -> maximum value of m/z (x axis) to use for plotting
 --digest_spectra (OPT, default = n) -> choose (y/n) if to plot the spectra for the theoretical digest
 --Sp_cutoff (OPT, default = 0) -> Minimum Sp score cutoff for target/decoy sequences
 --dSp_cutoff (OPT, default = 1) -> Maximum dSp score cutoff for target/decoy sequences

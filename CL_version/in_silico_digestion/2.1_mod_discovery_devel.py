@@ -36,45 +36,59 @@ from itertools import product
 import pandas as pd
 
 # Initialize and define launch options
-parser = argparse.ArgumentParser(description='List of available options')
-parser.add_argument('--mod_discovery', required=True,
-                    help='File with molecule-specific RNA modifications '
-                         '(Required, be sure to fill the Originating_base column!!!!)')
-parser.add_argument('--nts_light', required=True,
-                    help='Excel spreadsheet with the standard nucleotides and optional modification alphabet '
-                         '(Required)')
-parser.add_argument('--max_mods_per_fragment', default=2, type=int,
-                    help='Specify the maximum number of variable modifications allowed per RNA fragment (Default = 2)')
+parser = argparse.ArgumentParser(description="List of available options")
+parser.add_argument(
+    "--mod_discovery",
+    required=True,
+    help="File with molecule-specific RNA modifications "
+    "(Required, be sure to fill the Originating_base column!!!!)",
+)
+parser.add_argument(
+    "--nts_light",
+    required=True,
+    help="Excel spreadsheet with the standard nucleotides and optional modification alphabet "
+    "(Required)",
+)
+parser.add_argument(
+    "--max_mods_per_fragment",
+    default=2,
+    type=int,
+    help="Specify the maximum number of variable modifications allowed per RNA fragment (Default = 2)",
+)
 args = parser.parse_args()
 
 
 def read_excel_input(nts_alph=args.nts_light):
     """
-     Create three dictionaries mod_alphabet, mod_origin and mod_partial
-     * mod_alphabet contains all ID : ID_ext couples, one letter and extended IDs or all modified base
-     * mod_origin contains all the unmodified nucleotides and is used for modification positions validation
-     * mod_partial contains all the partial modified nucleotides for each modification (as from the alphabet file)
-     in case the option for partial modifications is selected
-     """
+    Create three dictionaries mod_alphabet, mod_origin and mod_partial
+    * mod_alphabet contains all ID : ID_ext couples, one letter and extended IDs or all modified base
+    * mod_origin contains all the unmodified nucleotides and is used for modification positions validation
+    * mod_partial contains all the partial modified nucleotides for each modification (as from the alphabet file)
+    in case the option for partial modifications is selected
+    """
     mod_origin, mod_alphabet = {}, {}
 
     if nts_alph:
         # Checking that the nts_light file given in argument exists
         if not os.path.exists(nts_alph):
-            print("ERROR! File {} does not exist. Execution terminated without output".format(nts_alph))
+            print(
+                "ERROR! File {} does not exist. Execution terminated without output".format(
+                    nts_alph
+                )
+            )
             sys.exit(1)
 
         # Create a dataframe with info from Excel spreadsheet
         df = pd.read_excel(nts_alph, header=12)
 
         # Drop rows with the 4 standard nucleobases
-        df = df[df.ID != 'C']
-        df = df[df.ID != 'G']
-        df = df[df.ID != 'A']
-        df = df[df.ID != 'U']
+        df = df[df.ID != "C"]
+        df = df[df.ID != "G"]
+        df = df[df.ID != "A"]
+        df = df[df.ID != "U"]
 
         # Drop rows with NaN values
-        df = df[pd.notnull(df['ID'])]
+        df = df[pd.notnull(df["ID"])]
 
         # Transform all ID values in string (so numbers can be used as one letter code for bases)
         df = df.astype({"ID": str})
@@ -94,10 +108,14 @@ def parse_input(modfile):
     """
     # Checking that the nts_light file given in argument exists
     if not os.path.exists(modfile):
-        print("ERROR! File {} does not exist. Execution terminated without output".format(modfile))
+        print(
+            "ERROR! File {} does not exist. Execution terminated without output".format(
+                modfile
+            )
+        )
         sys.exit(1)
 
-    with open(modfile, 'r') as f:
+    with open(modfile, "r") as f:
         for line in f:
             yield line.strip().split()
 
@@ -109,10 +127,11 @@ def mod_input(mods, header):
     df = pd.DataFrame(mods)
 
     new_header = df.iloc[header]
-    df = df[(header + 1):]
+    df = df[(header + 1) :]
     df.columns = new_header
 
     return df
+
 
 def make_patterns(seq, mods):
     """
@@ -140,53 +159,59 @@ def make_patterns(seq, mods):
                 new_seqs.append("".join(out_seq))
                 i -= 1
 
-    # If the fragment contains less than the specified maximum number of variable modifications, apply all    
+    # If the fragment contains less than the specified maximum number of variable modifications, apply all
     else:
         for t in product(mods, repeat=len(indices)):
             for i, c in zip(indices, t):
                 seq_list[i] = c
 
-            new_seqs.append(''.join(seq_list))
+            new_seqs.append("".join(seq_list))
 
     return list(set(new_seqs))
 
 
-def new_fragments(mod_origin, mod_alph, mods=mod_input(parse_input(args.mod_discovery), 0),
-                  input_lines=mod_input(parse_input("output.2"), 7)):
+def new_fragments(
+    mod_origin,
+    mod_alph,
+    mods=mod_input(parse_input(args.mod_discovery), 0),
+    input_lines=mod_input(parse_input("output.2"), 7),
+):
     """
     Generate all the possible combination of base modifications for the input fragments
-    
+
     Combinations are generated via cartesian product between the original sequence and the
     modified/unmodified nucleobase
     """
     out_lines = []
 
     # Creates a list with all the input fragment sequences
-    input_nts = list(input_lines['Seq'])
-    new_seqs = list(input_lines['Seq'])
+    input_nts = list(input_lines["Seq"])
+    new_seqs = list(input_lines["Seq"])
 
     # Creates a list with all the input modifications for discovery mode
-    input_mods = list(mods['ID'])
+    input_mods = list(mods["ID"])
 
     # Adds all the new modification combinations
     for mod in input_mods:
         for nts in input_nts:
 
-            mol, nstart, nend, miss, chem3, chem5 = (input_lines.loc[input_lines['Seq'] == nts, 'Molecule'].iloc[0],
-                                       input_lines.loc[input_lines['Seq'] == nts, 'Nstart'].iloc[0],
-                                       input_lines.loc[input_lines['Seq'] == nts, 'Nend'].iloc[0],
-                                       input_lines.loc[input_lines['Seq'] == nts, 'Miss'].iloc[0],
-                                       input_lines.loc[input_lines['Seq'] == nts, "3'chem"].iloc[0],
-                                       input_lines.loc[input_lines['Seq'] == nts, "5'chem"].iloc[0])
+            mol, nstart, nend, miss, chem3, chem5 = (
+                input_lines.loc[input_lines["Seq"] == nts, "Molecule"].iloc[0],
+                input_lines.loc[input_lines["Seq"] == nts, "Nstart"].iloc[0],
+                input_lines.loc[input_lines["Seq"] == nts, "Nend"].iloc[0],
+                input_lines.loc[input_lines["Seq"] == nts, "Miss"].iloc[0],
+                input_lines.loc[input_lines["Seq"] == nts, "3'chem"].iloc[0],
+                input_lines.loc[input_lines["Seq"] == nts, "5'chem"].iloc[0],
+            )
 
             for new_seq in make_patterns(nts, mod + mod_origin[mod]):
 
                 if new_seq not in new_seqs:
 
                     # Determine the sequence written in human readable format
-                    modification_input, mod_flag = '', 0
+                    modification_input, mod_flag = "", 0
                     for s in new_seq:
-                        if s == 'A' or s == 'U' or s == 'G' or s == 'C':
+                        if s == "A" or s == "U" or s == "G" or s == "C":
                             modification_input += s
 
                         else:
@@ -194,16 +219,24 @@ def new_fragments(mod_origin, mod_alph, mods=mod_input(parse_input(args.mod_disc
                             mod_flag = 1
 
                     if mod_flag == 0:
-                        modification_input = '-'
+                        modification_input = "-"
 
-                    # Prepare the final line for the output    
-                    line = "{} {} {} {} {} {} {} {}\n".format(mol, new_seq, nstart, nend, miss, chem5, chem3,
-                                                              modification_input)
+                    # Prepare the final line for the output
+                    line = "{} {} {} {} {} {} {} {}\n".format(
+                        mol,
+                        new_seq,
+                        nstart,
+                        nend,
+                        miss,
+                        chem5,
+                        chem3,
+                        modification_input,
+                    )
 
                     new_seqs.append(new_seq)
                     out_lines.append(line)
 
-    return (out_lines)
+    return out_lines
 
 
 if __name__ == "__main__":
@@ -214,5 +247,5 @@ if __name__ == "__main__":
 
     mod_origin, mod_alph = read_excel_input()
 
-    with open("output.2", 'a') as infile:
+    with open("output.2", "a") as infile:
         infile.writelines(new_fragments(mod_origin, mod_alph))

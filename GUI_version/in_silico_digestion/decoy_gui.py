@@ -29,29 +29,35 @@ class Decoys:
         """
         Generate the output file and replace the output.3.MS2
         """
-        open('./output.3.5', 'w').writelines(output_lines(self.input_file, decoy_lines(self.input_file,
-                                                                                       list(sequence_list(
-                                                                                           self.input_file)),
-                                                                                       read_csv())))
-        os.remove('./' + self.input_file)
-        move('./output.3.5', './' + self.input_file)
+        open("./output.3.5", "w").writelines(
+            output_lines(
+                self.input_file,
+                decoy_lines(
+                    self.input_file, list(sequence_list(self.input_file)), read_csv()
+                ),
+            )
+        )
+        os.remove("./" + self.input_file)
+        move("./output.3.5", "./" + self.input_file)
 
 
-def read_csv(input_csv='./nts_light.csv'):
+def read_csv(input_csv="./nts_light.csv"):
     """
     Create a dictionary containing all ID : ID_ext couples, one letter and extended IDs for all nucleotides
     """
     if not os.path.isfile(input_csv):
-        print("ERROR! File {} with info on nucleotides from script 2_modify.py is missing."
-              "Execution terminated without generating decoys".format(input_csv))
+        print(
+            "ERROR! File {} with info on nucleotides from script 2_modify.py is missing."
+            "Execution terminated without generating decoys".format(input_csv)
+        )
         sys.exit(1)
 
     else:
         # Read the csv file with the nucleotides dictionary
-        df = pd.read_csv(input_csv, usecols=['ID', 'ID_ext'])
+        df = pd.read_csv(input_csv, usecols=["ID", "ID_ext"])
 
         # Drop rows with NaN values
-        df = df[pd.notnull(df['ID'])]
+        df = df[pd.notnull(df["ID"])]
 
         return dict(zip(df.ID, df.ID_ext))
 
@@ -62,14 +68,16 @@ def sequence_list(input_file):
     """
     # Check if the input file output.3.MS2 is present in the directory
     if not os.path.isfile("./" + input_file):
-        print("ERROR! Input file output.3.MS2 is missing. Execution terminated without generating decoys")
+        print(
+            "ERROR! Input file output.3.MS2 is missing. Execution terminated without generating decoys"
+        )
         sys.exit(1)
 
     # Extract all the sequences present in the input file
     sequence_list = []
-    with open("./" + input_file, 'r') as infile:
+    with open("./" + input_file, "r") as infile:
         for line in infile:
-            if line[0] != '#' and line.split()[0] != 'sequence':
+            if line[0] != "#" and line.split()[0] != "sequence":
                 split = line.split()
                 sequence_list.append((split[0], split[3], split[4]))
 
@@ -87,11 +95,11 @@ def decoy_lines(input_file, seq_list, nts):
     outlines = []
 
     # Cycle among the lines of the input file
-    with open(input_file, 'r') as infile:
+    with open(input_file, "r") as infile:
         for line in infile:
 
             # Lines of the header are excluded
-            if line[0] != '#' and line.split()[0] != 'sequence' and 'decoy' not in line:
+            if line[0] != "#" and line.split()[0] != "sequence" and "decoy" not in line:
                 seq, chem3, chem5 = line.split()[0], line.split()[3], line.split()[4]
 
                 # Only sequences at least 3 nts long are considered to create decoys
@@ -101,16 +109,19 @@ def decoy_lines(input_file, seq_list, nts):
                     # Set the maximum number of shuffled sequences to be tried, being the length of the entry ^ 4
                     for i in range(1, len(entry) ** 4):
                         shuffle(entry)
-                        new_seq = ''.join(entry)
+                        new_seq = "".join(entry)
 
                         # If the shuffled sequence is not in the input it is added in a new line
                         # and moves to next input line
                         if (new_seq + seq[-1], chem3, chem5) not in seq_list:
 
                             seq_list.append((new_seq + seq[-1], chem3, chem5))
-                            if line.split()[1] == '-':
+                            if line.split()[1] == "-":
                                 outlines.append(
-                                    "{} {} 1 decoy decoy - -\n".format(new_seq + seq[-1], ' '.join(line.split()[1:5])))
+                                    "{} {} 1 decoy decoy - -\n".format(
+                                        new_seq + seq[-1], " ".join(line.split()[1:5])
+                                    )
+                                )
                                 break
 
                             else:
@@ -120,8 +131,13 @@ def decoy_lines(input_file, seq_list, nts):
                                 for nt in new_seq + seq[-1]:
                                     final_seq += nts[nt]
 
-                                outlines.append("{} {} {} 1 decoy decoy - -\n".format(new_seq + seq[-1], final_seq,
-                                                                                      ' '.join(line.split()[2:5])))
+                                outlines.append(
+                                    "{} {} {} 1 decoy decoy - -\n".format(
+                                        new_seq + seq[-1],
+                                        final_seq,
+                                        " ".join(line.split()[2:5]),
+                                    )
+                                )
 
                                 break
 
@@ -134,10 +150,12 @@ def output_lines(input_file, decoy_lines):
     """
     # Check if the input file output.3.MS2 is present in the directory
     if not os.path.isfile("./" + input_file):
-        print("ERROR! Input file output.3.MS2 is missing. Execution terminated without generating decoys")
+        print(
+            "ERROR! Input file output.3.MS2 is missing. Execution terminated without generating decoys"
+        )
         sys.exit(1)
 
-    with open("./output.3.MS2", 'r') as infile:
+    with open("./output.3.MS2", "r") as infile:
         input_lines = infile.readlines()
 
     return input_lines + decoy_lines
