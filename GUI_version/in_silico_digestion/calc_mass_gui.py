@@ -52,6 +52,7 @@ ele_mass = {
     "S": 31.9720711744,
     "P": 30.9737619984,
     "Se": 79.9165218,
+    "F": 18.998403163,
     "H2": 2.0141017781,
     "C13": 13.0033548351,
     "N15": 15.0001088989,
@@ -1282,6 +1283,7 @@ def nts_mass(df):
             + np.float64(row["P"]) * ele_mass["P"]
             + np.float64(row["S"]) * ele_mass["S"]
             + np.float64(row["Se"]) * ele_mass["Se"]
+            + np.float64(row["F"]) * ele_mass["F"]
             + np.float64(row["C13"]) * ele_mass["C13"]
             + np.float64(row["O18"]) * ele_mass["O18"]
             + np.float64(row["N15"]) * ele_mass["N15"]
@@ -1299,6 +1301,7 @@ def nts_mass(df):
             + np.float64(row["P.1"]) * ele_mass["P"]
             + np.float64(row["S.1"]) * ele_mass["S"]
             + np.float64(row["Se.1"]) * ele_mass["Se"]
+            + np.float64(row["F.1"]) * ele_mass["F"]
             + np.float64(row["C13.1"]) * ele_mass["C13"]
             + np.float64(row["O18.1"]) * ele_mass["O18"]
             + np.float64(row["N15.1"]) * ele_mass["N15"]
