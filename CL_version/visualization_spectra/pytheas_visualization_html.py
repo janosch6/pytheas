@@ -320,8 +320,8 @@ def mgf_peaks(input_file):
 
     # Transform the m/z and intensity data in pandas dataframe format
     for key in dic:
-        out_dic[key] = pd.DataFrame({'m/z': np.round_(dic[key]['m/z array'], decimals=6),
-                                     'intensity': np.round_(dic[key]['intensity array'], decimals=6)},
+        out_dic[key] = pd.DataFrame({'m/z': np.round(dic[key]['m/z array'], decimals=6),
+                                     'intensity': np.round(dic[key]['intensity array'], decimals=6)},
                                     dtype=np.float64)
 
     try:

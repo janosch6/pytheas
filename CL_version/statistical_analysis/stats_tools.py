@@ -16,8 +16,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import statistics
 
-np.warnings.filterwarnings('ignore', category=np.VisibleDeprecationWarning)
-
 
 def read_excel_input(nts_file):
     """

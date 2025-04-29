@@ -17,8 +17,6 @@ import pandas as pd
 import numpy as np
 import statistics
 
-np.warnings.filterwarnings("ignore", category=np.VisibleDeprecationWarning)
-
 
 def read_excel_input(nts_file):
     """

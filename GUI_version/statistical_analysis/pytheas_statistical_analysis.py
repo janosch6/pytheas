@@ -14,6 +14,7 @@ can be found in the Pytheas manual.
 
 from gooey import Gooey, GooeyParser
 from statistics_library import Stats
+import os
 
 
 @Gooey(
@@ -25,23 +26,28 @@ def statistical_plots():
     description = "Generate statistical plots for quality assessment of the database matching process"
     parser = GooeyParser(description=description)
 
+    base_path = os.getcwd() + "/output/matching_scoring/"
+
     # Required arguments
     parser.add_argument(
         "Targets",
         widget="FileChooser",
         help="Pytheas matching and scoring output file with a list of top scoring "
         "target sequences (targets_[dataset].csv)",
+        default=base_path + "targets_test_set.csv",
     )
     parser.add_argument(
         "Decoys",
         widget="FileChooser",
         help="Pytheas matching and scoring output file with a list of top scoring "
         "decoy sequences (decoys_[dataset].csv)",
+        default=base_path + "decoys_test_set.csv",
     )
     parser.add_argument(
         "Match_output",
         widget="FileChooser",
         help="Pytheas matching and scoring .txt output file",
+        default=base_path + "match_output_test_set.txt",
     )
 
     # Optional Arguments
@@ -93,6 +99,10 @@ def statistical_plots():
 
     ####################################################
     args = parser.parse_args()
+
+    output_dir = os.path.join(os.getcwd(), "output/statistical_analysis")
+    os.makedirs(output_dir, exist_ok=True)
+    os.chdir(output_dir)
 
     statistics = Stats(
         args.Targets,

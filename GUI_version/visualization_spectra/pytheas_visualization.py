@@ -17,6 +17,7 @@ Pytheas manual
 
 from gooey import Gooey, GooeyParser
 from visualization_library import Visualize
+import os
 
 
 @Gooey(
@@ -28,21 +29,25 @@ def visualizer():
     description = "Generate a summary table and graphical output of spectra matched to candidate sequences"
     parser = GooeyParser(description=description)
 
+    base_path = os.getcwd() + "/"
     # Required arguments
     parser.add_argument(
         "Theoretical_digest",
         widget="FileChooser",
         help="Pytheas in silico digestion output file",
+        default=base_path + "output/in_silico_digestion/Digest_test_set_sequences.txt",
     )
     parser.add_argument(
         "MS_data",
         widget="FileChooser",
         help="Experimental data peak list in mgf format",
+        default=base_path + "Test_data/test_set.mgf",
     )
     parser.add_argument(
         "Match_output",
         widget="FileChooser",
         help="Pytheas matching and scoring .txt output file",
+        default=base_path + "output/matching_scoring/match_output_test_set.txt",
     )
 
     # Optional arguments
@@ -122,6 +127,10 @@ def visualizer():
 
     ####################################################
     args = parser.parse_args()
+
+    output_dir = os.path.join(os.getcwd(), "output/visualization_spectra")
+    os.makedirs(output_dir, exist_ok=True)
+    os.chdir(output_dir)
 
     visualization = Visualize(
         args.Theoretical_digest,

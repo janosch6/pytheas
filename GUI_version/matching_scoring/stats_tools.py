@@ -17,8 +17,6 @@ import pandas as pd
 import numpy as np
 import statistics
 
-np.warnings.filterwarnings("ignore", category=np.VisibleDeprecationWarning)
-
 
 def read_excel_input(nts_file):
     """
@@ -106,7 +104,7 @@ def input_data(infile, excel, sumi_all):
             "MS2_matches": [],
         }
 
-    with open("./" + infile, "rU") as input_file:
+    with open("./" + infile, "r") as input_file:
         for line in input_file:
 
             if line[0].isdigit():

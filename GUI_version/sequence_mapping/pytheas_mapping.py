@@ -15,6 +15,7 @@ OUTPUT
 
 from gooey import Gooey, GooeyParser
 from mapping_library import Mapping
+import os
 
 
 @Gooey(
@@ -26,18 +27,27 @@ def mapper():
     description = "Generate a graphical output of identified targets mapped on the input RNA sequence(s)"
     parser = GooeyParser(description=description)
 
+    base_path = os.getcwd() + "/Test_data/"
+
     # Required arguments
     parser.add_argument(
-        "Final_report", help="Pytheas final report output file", widget="FileChooser"
+        "Final_report",
+        help="Pytheas final report output file",
+        widget="FileChooser",
+        default=os.getcwd() + "/output/final_report/final_report_test_set.csv",
     )
     parser.add_argument(
         "Nucleotides_list",
         widget="FileChooser",
         help="Elemental composition file for standard and "
         "modified nucleotides (Excel spreadsheet)",
+        default=base_path + "nts_light.xlsx",
     )
     parser.add_argument(
-        "RNA_sequence", widget="FileChooser", help="Input RNA sequence in fasta format"
+        "RNA_sequence",
+        widget="FileChooser",
+        help="Input RNA sequence in fasta format",
+        default=base_path + "test_set_sequences.fasta",
     )
 
     # Optional arguments
@@ -56,6 +66,10 @@ def mapper():
 
     ####################################################
     args = parser.parse_args()
+
+    output_dir = os.path.join(os.getcwd(), "output/sequence_mapping")
+    os.makedirs(output_dir, exist_ok=True)
+    os.chdir(output_dir)
 
     map_sequences = Mapping(
         args.Nucleotides_list,

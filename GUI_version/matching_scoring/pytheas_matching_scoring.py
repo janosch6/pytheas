@@ -15,6 +15,7 @@ Pytheas manual
 
 from gooey import Gooey, GooeyParser
 from match_library import Match
+import os
 
 
 @Gooey(
@@ -26,16 +27,20 @@ def matching_scoring():
     description = "Generate a list of oligonucleotide spectra matches against the theoretical digest library"
     parser = GooeyParser(description=description)
 
+    base_path = os.getcwd()
+
     # Required Arguments
     parser.add_argument(
         "Theoretical_digest",
         help="Pytheas in silico digestion output file",
         widget="FileChooser",
+        default=base_path + "/output/in_silico_digestion/Digest_test_set_sequences.txt",
     )
     parser.add_argument(
         "MS_data",
         help="Experimental data peak list in mgf format",
         widget="FileChooser",
+        default=base_path + "/Test_data/test_set.mgf",
     )
 
     # Optional Arguments
@@ -161,6 +166,10 @@ def matching_scoring():
 
     ####################################################
     args = parser.parse_args()
+
+    output_dir = os.path.join(os.getcwd(), "output/matching_scoring")
+    os.makedirs(output_dir, exist_ok=True)
+    os.chdir(output_dir)
 
     match = Match(
         args.Theoretical_digest,

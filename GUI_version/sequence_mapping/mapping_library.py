@@ -77,7 +77,7 @@ class Mapping:
                 handle, "fasta"
             ):  # Extract and process the sequences within fasta files
 
-                sequence = str(seq.seq.ungap("-"))
+                sequence = str(seq.seq).replace("-", "")
                 seq_output[str(seq.id)] = list(sequence)
 
         # Create dataframes with the sequences
@@ -143,7 +143,7 @@ class Mapping:
         """
         series, nts_dic = self.group_df(), self.read_excel_input()
         d = {}
-        for index, row in series.iteritems():
+        for index, row in series.items():
 
             # decoy lines are not considered for mapping purposes
             if "decoy" not in index:

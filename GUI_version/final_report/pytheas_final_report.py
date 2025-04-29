@@ -13,6 +13,7 @@ Additional information on the output file and the parameters can be found in the
 
 from gooey import Gooey, GooeyParser
 from final_report_library import Pytheas_Output
+import os
 
 
 @Gooey(
@@ -29,6 +30,7 @@ def pytheas_output():
         "Match_output",
         widget="FileChooser",
         help="Pytheas matching and scoring .txt output file",
+        default=os.getcwd() + "/output/matching_scoring/match_output_test_set.txt",
     )
 
     # Optional Arguments
@@ -91,6 +93,10 @@ def pytheas_output():
 
     ####################################################
     args = parser.parse_args()
+
+    output_dir = os.path.join(os.getcwd(), "output/final_report")
+    os.makedirs(output_dir, exist_ok=True)
+    os.chdir(output_dir)
 
     output = Pytheas_Output(
         args.Match_output,

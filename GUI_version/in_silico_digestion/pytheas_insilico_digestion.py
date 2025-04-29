@@ -197,7 +197,7 @@ def in_silico_digest():
     ####################################################
     args = parser.parse_args()
 
-    output_dir = os.path.join(os.getcwd(), "output_in_silico_digestion")
+    output_dir = os.path.join(os.getcwd(), "output/in_silico_digestion")
     os.makedirs(output_dir, exist_ok=True)
     os.chdir(output_dir)
 

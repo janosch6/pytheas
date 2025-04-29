@@ -552,13 +552,14 @@ class Visualize:
                 ]
                 * 1.175
             )
+
             if peak_max.empty:
                 y_max = round_number(max(input_mgf[key_mgf]["intensity"]) * 1.175)
             else:
                 y_max = round_number(
                     input_mgf[key_mgf].loc[input_mgf[key_mgf]["m/z"] == mz_highest_ion][
                         "intensity"
-                    ]
+                    ].iloc[0]
                     * 1.175
                 )
 
@@ -578,7 +579,7 @@ class Visualize:
 
                 else:
                     x_min = self.mz_min
-
+            
             if not self.mz_max:
 
                 # Set the x axis maximum as the m/z value of the highest ion in the mgf scan
@@ -643,7 +644,7 @@ class Visualize:
 
             if match[1]["sequence_mod"] != "-":
                 ax.set_title(
-                    "M={}  RT={}  seq=$\it{}$-{}-$\it{}$  seq_mod=$\it{}$-{}-$\it{}$  Sp={}  dSp={}  charge={}  "
+                    "M={}  RT={}  seq=$\it {}$-{}-$\it {}$  seq_mod=$\it {}$-{}-$\it {}$  Sp={}  dSp={}  charge={}  "
                     "molecule={}  position={}".format(
                         match[0].split("_")[0],
                         match[0].split("_")[1],
@@ -663,7 +664,7 @@ class Visualize:
 
             else:
                 ax.set_title(
-                    "M={}  RT={}  seq=$\it{}$-{}-$\it{}$  Sp={}  dSp={}  charge={}  molecule={}  "
+                    "M={}  RT={}  seq=$\it {}$-{}-$\it {}$  Sp={}  dSp={}  charge={}  molecule={}  "
                     "position={}".format(
                         match[0].split("_")[0],
                         match[0].split("_")[1],
@@ -817,26 +818,26 @@ class Visualize:
                 (input_mgf[key_mgf]["m/z"] - prec).abs().argsort()[:1]
             ]["m/z"]
             prec_y = input_mgf[key_mgf].loc[
-                input_mgf[key_mgf]["m/z"] == np.float64(prec_x), "intensity"
+                input_mgf[key_mgf]["m/z"] == np.float64(prec_x.iloc[0]), "intensity"
             ]
 
             plt.axvline(
-                np.float64(prec_x),
-                ymax=np.float64(prec_y) / y_max,
+                np.float64(prec_x.iloc[0]),
+                ymax=np.float64(prec_y.iloc[0]) / y_max,
                 color="black",
                 linewidth=self.bars_width,
                 linestyle="-",
             )
 
             # Add a label for the precursor ion
-            if np.float64(prec_y) < y_max:
+            if np.float64(prec_y.iloc[0]) < y_max:
                 ax.annotate(
                     "M({})".format(match[1]["charge"]),
-                    xy=(np.float64(prec_x), 1.01 * np.float64(prec_y)),
+                    xy=(np.float64(prec_x.iloc[0]), 1.01 * np.float64(prec_y.iloc[0])),
                     xycoords="data",
                     xytext=(
-                        np.float64(prec_x) + self.bars_width * 4,
-                        np.float64(prec_y),
+                        np.float64(prec_x.iloc[0]) + self.bars_width * 4,
+                        np.float64(prec_y.iloc[0]),
                     ),
                     textcoords="data",
                     size=7,
@@ -845,10 +846,10 @@ class Visualize:
             else:
                 ax.annotate(
                     "M({})".format(match[1]["charge"]),
-                    xy=(np.float64(prec_x) * 1.02, y_max * 0.95),
+                    xy=(np.float64(prec_x.iloc[0]) * 1.02, y_max * 0.95),
                     xycoords="data",
                     xytext=(
-                        np.float64(prec_x) * 1.01 + self.bars_width * 4,
+                        np.float64(prec_x.iloc[0]) * 1.01 + self.bars_width * 4,
                         y_max * 0.95,
                     ),
                     textcoords="data",
@@ -1030,7 +1031,6 @@ class Visualize:
         with open("visualization_{}.html".format(output_name), "w") as _file:
             _file.writelines(self.html_lines)
 
-
 def round_number(x, base=25):
     """
     Round a number to its closest integer value multiple of 25. Used to determine values for the axis
@@ -1186,8 +1186,8 @@ def mgf_peaks(input_file):
     for key in dic:
         out_dic[key] = pd.DataFrame(
             {
-                "m/z": np.round_(dic[key]["m/z array"], decimals=6),
-                "intensity": np.round_(dic[key]["intensity array"], decimals=6),
+                "m/z": np.round(dic[key]["m/z array"], decimals=6),
+                "intensity": np.round(dic[key]["intensity array"], decimals=6),
             },
             dtype=np.float64,
         )
