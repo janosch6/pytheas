@@ -17,6 +17,7 @@ from modify_gui import Modifications
 from consolidate_gui import Consolidation
 from decoy_gui import Decoys
 from calc_mass_gui import Masses
+import os
 
 
 @Gooey(
@@ -25,6 +26,9 @@ from calc_mass_gui import Masses
     default_size=(1920, 1080),
 )
 def in_silico_digest():
+
+    base_path = os.getcwd() + "/Test_data/"
+
     description = "Generate theoretical digest library"
     parser = GooeyParser(description=description)
 
@@ -33,6 +37,7 @@ def in_silico_digest():
         "RNA_sequences",
         help="Input RNA sequence(s) in fasta format",
         widget="MultiFileChooser",
+        default = base_path + "test_set_sequences.fasta"
     )
     parser.add_argument(
         "Enzyme",
@@ -49,20 +54,20 @@ def in_silico_digest():
         "Nucleotides_light",
         help="Elemental composition file for standard and modified nucleotides (Excel spreadsheet)",
         widget="FileChooser",
-        default="nts_light.xlsx",
+        default = base_path + "nts_light.xlsx",
     )
     parser.add_argument(
         "Ion_mode", choices=["+", "-"], default="-", help="Negative (-) or Positive (+)"
     )
     parser.add_argument(
         "MS1_charges_table",
-        default="charges_MS1.txt",
+        default = base_path + "charges_MS1.txt",
         widget="FileChooser",
         help="Charge table for precursor ions (MS1)",
     )
     parser.add_argument(
         "MS2_charges_table",
-        default="charges_MS2.txt",
+        default = base_path + "charges_MS2.txt",
         widget="FileChooser",
         help="Charge table for fragment ions (MS2)",
     )
@@ -75,6 +80,7 @@ def in_silico_digest():
         "--list_of_known_RNA_modifications",
         help="List of nucleotide modifications info",
         widget="FileChooser",
+        default =  base_path + "modfile_test_set.txt"
     )
     parser.add_argument(
         "--enzyme_missed_cleavages",
@@ -189,6 +195,10 @@ def in_silico_digest():
 
     ####################################################
     args = parser.parse_args()
+
+    output_dir = os.path.join(os.getcwd(), "output_in_silico_digestion")
+    os.makedirs(output_dir, exist_ok=True)
+    os.chdir(output_dir)
 
     # Step 1/4 - Enzymatic Cleavage
     enzyme = Enzyme_cleavage(
