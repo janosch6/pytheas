@@ -49,6 +49,7 @@ def in_silico_digest():
                 "message": "Enzyme is required",
             }
         },
+        default="none"
     )
     parser.add_argument(
         "Nucleotides_light",
