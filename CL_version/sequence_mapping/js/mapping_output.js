@@ -71,7 +71,7 @@ for (var i = 0; i < tables.length; i++) {
 			tds[j].innerHTML = ScoreSplit[6];
 
 			//Makes the text bigger and the cell grey if a modified base is found
-			if (ScoreSplit[6] != 'C' && ScoreSplit[6] != 'G' && ScoreSplit[6] != 'A' && ScoreSplit[6] != 'U' && ScoreSplit[6] != 'X') {
+			if (ScoreSplit[6] != 'C' && ScoreSplit[6] != 'G' && ScoreSplit[6] != 'A' && ScoreSplit[6] != 'U' && ScoreSplit[6] != 'T' && ScoreSplit[6] != 'X') {
 
 				tds[j].style.fontSize = "10px";
 				tds[j].style.border = "1px solid black";

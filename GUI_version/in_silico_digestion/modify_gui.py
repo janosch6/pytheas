@@ -82,6 +82,7 @@ class Modifications:
         df = df[df.ID != "G"]
         df = df[df.ID != "A"]
         df = df[df.ID != "U"]
+        df = df[df.ID != "T"]
 
         # Drop rows with NaN values
         df = df[pd.notnull(df["ID"])]
@@ -179,6 +180,7 @@ class Modifications:
                                                 or nt == "C"
                                                 or nt == "G"
                                                 or nt == "U"
+                                                or nt == "T"
                                             ):
                                                 outseq += nt
                                             else:

@@ -342,7 +342,7 @@ def mod_detection(sequence):
     """
     mod_bases = []
     for nt in sequence:
-        if nt != "A" and nt != "C" and nt != "G" and nt != "U" and nt != "X":
+        if nt != "A" and nt != "C" and nt != "G" and nt != "U" and nt != "T" and nt != "X":
             mod_bases.append(nt)
 
     return mod_bases
@@ -673,6 +673,7 @@ def L(mz_match, d, mod_bases):
                 and series != "A"
                 and series != "C"
                 and series != "U"
+                and series != "T"
             ):
 
                 # Excludes free bases from modified nucleotides
@@ -715,6 +716,7 @@ def sumI(list_MS2, mod_bases):
                     and series != "A"
                     and series != "C"
                     and series != "U"
+                    and series != "T"
                 ):
 
                     # Excludes free bases from modified nucleotides
@@ -749,6 +751,7 @@ def n_calc(list_MS2, mod_bases):
                 and series != "A"
                 and series != "C"
                 and series != "U"
+                and series != "T"
             ):
 
                 # Exclude free bases from modified nucleotides

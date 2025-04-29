@@ -281,6 +281,7 @@ def iupac_letter_codes_nts():
         "C": "C",
         "G": "G",
         "U": "U",
+        "T": "T",
         "Y": "[CU]",
         "R": "[AG]",
         "N": "[ACGU]",

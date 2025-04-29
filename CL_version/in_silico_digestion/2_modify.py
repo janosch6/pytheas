@@ -122,6 +122,7 @@ def read_excel_input(nts_alph=args.nts_light):
         df = df[df.ID != "G"]
         df = df[df.ID != "A"]
         df = df[df.ID != "U"]
+        df = df[df.ID != "T"]
 
         # Drop rows with NaN values
         df = df[pd.notnull(df["ID"])]
@@ -211,7 +212,7 @@ def mod_0_1_2_mode(profile_mod, input_lines, mod_alphabet):
 
                             outseq = ""
                             for nt in s:
-                                if nt == "A" or nt == "C" or nt == "G" or nt == "U":
+                                if nt == "A" or nt == "C" or nt == "G" or nt == "U" or nt == "T":
                                     outseq += nt
                                 else:
                                     outseq += mod_alphabet[nt]

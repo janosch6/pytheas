@@ -302,7 +302,7 @@ def modification_position(molecule, modification_short, modification_ext):
     """
     Extract a list of the positions for the modified nucleotides inside a given match
     """
-    standard_bases = ["A", "G", "U", "C"]
+    standard_bases = ["A", "G", "U", "C", "T"]
     modification_positions, output_strings = [], []
 
     for index, nt in enumerate(modification_short):

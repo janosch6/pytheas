@@ -85,6 +85,7 @@ def read_excel_input(nts_alph=args.nts_light):
         df = df[df.ID != "C"]
         df = df[df.ID != "G"]
         df = df[df.ID != "A"]
+        df = df[df.ID != "T"]
         df = df[df.ID != "U"]
 
         # Drop rows with NaN values
@@ -211,7 +212,7 @@ def new_fragments(
                     # Determine the sequence written in human readable format
                     modification_input, mod_flag = "", 0
                     for s in new_seq:
-                        if s == "A" or s == "U" or s == "G" or s == "C":
+                        if s == "A" or s == "U" or s == "G" or s == "C" or s == "T":
                             modification_input += s
 
                         else:
